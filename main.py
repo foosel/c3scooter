@@ -190,7 +190,8 @@ breathing = BreathingEffect((127, 127, 127), 100)
 rainbow = RainbowEffect(100)
 fire = FireEffect(100, 60, 15)
 
-effects = (rainbow, fire, larson, breathing)
+#effects = (rainbow, fire, larson, breathing)
+effects = (fire,)
 #effect = random.choice(effects)
 
 #while(True):
