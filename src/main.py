@@ -133,10 +133,17 @@ class RainbowEffect(Effect):
 		return (r, g, b)
 
 class FireEffect(Effect):
-	def __init__(self, cooling, sparking, delay):
+	# hot, mid, cold
+	RED = (lambda x: (255, 255, x), lambda x: (255, x, 0), lambda x: (x, 0, 0))
+	BLUE = (lambda x: (x, 255, 255), lambda x: (0, x, 255), lambda x: (0, 0, x))
+	GREEN = (lambda x: (x, 255, x), lambda x: (x, 255, 0), lambda x: (0, x, 0))
+
+	def __init__(self, cooling, sparking, delay, color=RED):
 		self._cooling = cooling
 		self._sparking = sparking
 		self._delay = delay
+		self._color = color
+
 		self._heat = None
 	
 	def run(self, lights):
@@ -178,20 +185,22 @@ class FireEffect(Effect):
 		heatramp *= 4
 
 		if t192 > 128: # hottest
-			lights.set_pixel(pixel, (255, 255, heatramp))
+			lights.set_pixel(pixel, self._color[0](heatramp))
 		elif t192 > 64: # middle
-			lights.set_pixel(pixel, (255, heatramp, 0))
+			lights.set_pixel(pixel, self._color[1](heatramp))
 		else: # coolest
-			lights.set_pixel(pixel, (heatramp, 0, 0))
+			lights.set_pixel(pixel, self._color[2](heatramp))
 
 lights = ScooterLight(PIXEL_PIN, PIXEL_COUNT)
 larson = LarsonScannerEffect((255, 0, 0), 30)
 breathing = BreathingEffect((127, 127, 127), 100)
 rainbow = RainbowEffect(100)
-fire = FireEffect(100, 60, 15)
+red_fire = FireEffect(100, 60, 15, FireEffect.RED)
+green_fire = FireEffect(100, 60, 15, FireEffect.GREEN)
+blue_fire = FireEffect(100, 60, 15, FireEffect.BLUE)
 
 #effects = (rainbow, fire, larson, breathing)
-effects = (fire,)
+effects = (red_fire, green_fire, blue_fire,)
 #effect = random.choice(effects)
 
 #while(True):
