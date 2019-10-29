@@ -12,3 +12,6 @@ A ridiculously over the top "pimp-my-ride" for my 36c3 scooter.
   * [WeSkate Scooter](https://www.amazon.de/gp/product/B07SS7GXDT/)
   * [Lolin D32](https://wiki.wemos.cc/products:d32:d32) (but any ESP32 or MicroPython based board should work just fine)
     * Note: The Lolin board appears to have a circuit design flaw causing in issues to enter the bootloader. It ships with MicroPython, flashing a new version is a major PITA however. Thankfully the python files can be deployed without needing that thanks to something like `ampy`.
+  * WS2812 LED strip, 5V, 60 Leds/m, optionally black PCB & IP67
+  * [RAVPower 5000mAh power bank](https://www.amazon.de/gp/product/B07KSWHV45/)
+
