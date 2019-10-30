@@ -202,7 +202,7 @@ async def task():
 	lights = ScooterLight(PIXEL_PIN, PIXEL_COUNT)
 
 	larson = LarsonScannerEffect((255, 0, 0), 30)
-    #rainbow = RainbowEffect(100)
+	rainbow = RainbowEffect(100)
 	red_fire = FireEffect(100, 60, 15, FireEffect.RED)
 	green_fire = FireEffect(100, 60, 15, FireEffect.GREEN)
 	blue_fire = FireEffect(100, 60, 15, FireEffect.BLUE)
