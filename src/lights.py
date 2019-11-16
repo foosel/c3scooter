@@ -182,7 +182,7 @@ class FireEffect(Effect):
 		for _ in range(100):
 			burn()
 			lights.apply()
-			asyncio.sleep_ms(self._delay)
+			await asyncio.sleep_ms(self._delay)
 	
 	def set_pixel_heat_color(self, lights, pixel, temperature):
 		t192 = round((temperature / 255) * 191)
@@ -211,6 +211,7 @@ async def task():
 
 	while(True):
 		for effect in effects:
+			print("LIGHTS: Running effect {!r}".format(effect))
 			for _ in range(5):
 				await effect.run(lights)
 			lights.clear()
