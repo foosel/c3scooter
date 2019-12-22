@@ -94,15 +94,21 @@ class Speedometer(object):
 
     def save(self, trip=True, total=True):
         if total:
-            with open("/data/total.txt", "wb") as f:
-                f.write("{}\n".format(self.distance))
-            print("SPEEDOMETER: Persisted total to /data/total.txt")
+            try:
+                with open("/data/total.txt", "wb") as f:
+                    f.write("{}\n".format(self.distance))
+                print("SPEEDOMETER: Persisted total to /data/total.txt")
+            except:
+                print("SPEEDOMETER: ERROR - could not save total to /data/total.txt")
 
         if trip:
-            with open("/data/trip.txt", "wb") as f:
-                f.write("{}\n".format(self.trip))
-                f.write("{}\n".format(self.top_speed))
-            print("SPEEDOMETER: Persisted trip data to /data/trip.txt")
+            try:
+                with open("/data/trip.txt", "wb") as f:
+                    f.write("{}\n".format(self.trip))
+                    f.write("{}\n".format(self.top_speed))
+                print("SPEEDOMETER: Persisted trip data to /data/trip.txt")
+            except:
+                print("SPEEDOMETER: ERROR - could not save trip to /data/trip.txt")
 
     async def persist(self):
         distance = self.distance
