@@ -17,12 +17,12 @@ class SwitchCounter(object):
         # debounce
         self._debounce = debounce
         self._debounced_until = time.ticks_ms() + self._debounce
-    
+
     def pop_counter(self):
         counter = self._counter
         self._counter = 0
         return counter
-    
+
     def handle_interrupt(self, pin):
         if time.ticks_ms() > self._debounced_until:
             print("SPEEDOMETER: beep")
@@ -37,10 +37,23 @@ class Speedometer(object):
         self.speed = 0.0
         self.distance = 0.0
         self.top_speed = 0.0
+        self.trip = 0.0
+
+        self.load()
 
         loop = asyncio.get_event_loop()
         loop.create_task(self.update())
-    
+        loop.create_task(self.persist())
+
+    def reset_trip(self):
+        self.trip = 0.0
+        self.top_speed = 0.0
+        self.push_to_callback()
+
+    def push_to_callback(self):
+        if self.callback:
+            self.callback(self.speed, self.distance, self.top_speed, self.trip)
+
     async def update(self):
         while(True):
             counter_value = self.counter.pop_counter()
@@ -53,14 +66,56 @@ class Speedometer(object):
 
             self.speed = speed
             self.distance += distance
+            self.trip += distance
             self.top_speed = max(self.top_speed, self.speed)
 
-            if dirty and self.callback:
-                self.callback(self.speed, self.distance, self.top_speed)
+            if dirty:
+                self.push_to_callback()
 
-            print("SPEEDOMETER: Counter: {} Distance: {}m Speed: {}km/h Total Distance: {}m Top Speed: {}".format(counter_value, 
-                                                                                                                distance / 1000.0, 
-                                                                                                                self.speed / 1000000.0,
-                                                                                                                self.distance / 1000.0,
-                                                                                                                self.top_speed / 1000000.0))
-            await asyncio.sleep(DELAY)        
+            await asyncio.sleep(DELAY)
+
+    def load(self):
+        try:
+            with open("/data/total.txt", "rb") as f:
+                self.distance = float(f.readline())
+            print("SPEEDOMETER: Total data loaded, {:2f} total".format(self.distance))
+        except:
+            print("SPEEDOMETER: ERROR - could not read distance from /data/total.txt, does it exist?")
+
+        try:
+            with open("/data/trip.txt", "rb") as f:
+                self.trip = float(f.readline())
+                self.top_speed = float(f.readline())
+            print("SPEEDOMETER: Trip data loaded, {:.2f} trip, {:.2f} top speed".format(self.trip, self.top_speed))
+        except:
+            print("SPEEDOMETER: ERROR - could not read trip and speed from /data/trip.txt, does it exist?")
+
+        self.push_to_callback()
+
+    def save(self, trip=True, total=True):
+        if total:
+            with open("/data/total.txt", "wb") as f:
+                f.write("{}\n".format(self.distance))
+            print("SPEEDOMETER: Persisted total to /data/total.txt")
+
+        if trip:
+            with open("/data/trip.txt", "wb") as f:
+                f.write("{}\n".format(self.trip))
+                f.write("{}\n".format(self.top_speed))
+            print("SPEEDOMETER: Persisted trip data to /data/trip.txt")
+
+    async def persist(self):
+        distance = self.distance
+        trip = self.trip
+        top_speed = self.top_speed
+
+        while True:
+            self.save(trip=self.trip != trip or self.top_speed != top_speed,
+                      total=self.distance != distance)
+
+            distance = self.distance
+            trip = self.trip
+            top_speed = self.top_speed
+
+            await asyncio.sleep(60)
+

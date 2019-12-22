@@ -50,7 +50,7 @@ class RotaryEncoder(object):
 class SafeDisplay(Display):
     def draw_text(self, x, y, text, font, color,  background=0,
                   landscape=False, spacing=1):
-        max_length = (self.width - x) // (font.width + spacing)
+        max_length = (self.width - x + spacing) // (font.width + spacing)
         text = text[0:min(max_length, len(text))]
         Display.draw_text(self, x, y, text, font, color, background=background,
                           landscape=landscape, spacing=spacing)
@@ -67,6 +67,12 @@ class DisplayScreen(object):
         pass
 
     def encoder_click(self):
+        pass
+
+    def encoder_dblclick(self):
+        pass
+
+    def encoder_longpress(self):
         pass
 
 class DemoScreen(DisplayScreen):
@@ -99,6 +105,8 @@ class ScooterDisplay(object):
         # Encoder button
         self.button = Pushbutton(Pin(PIN_KNOB_SWITCH, Pin.IN))
         self.button.release_func(self.encoder_push)
+        self.button.double_func(self.encoder_dblpush)
+        self.button.long_func(self.encoder_longpush)
 
     def encoder_cw(self, steps):
         print("DISPLAY: Encoder CW, {} steps".format(steps))
@@ -115,6 +123,14 @@ class ScooterDisplay(object):
     def encoder_push(self):
         print("DISPLAY: Encoder PUSH")
         self.screens[self._screen].encoder_click()
+
+    def encoder_dblpush(self):
+        print("DISPLAY: Encoder DBLPUSH")
+        self.screens[self._screen].encoder_dblclick()
+
+    def encoder_longpush(self):
+        print("DISPLAY: Encoder LONGPUSH")
+        self.screens[self._screen].encoder_longpress()
 
     async def update_display(self):
         current_screen = self._screen
