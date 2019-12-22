@@ -29,23 +29,38 @@ class SwitchCounter(object):
             self._debounced_until = time.ticks_ms() + self._debounce
             self._counter += 1
 
-async def task():
-    counter = SwitchCounter(REED_PIN, debounce=50)
+class Speedometer(object):
+    def __init__(self, callback=None):
+        self.counter = SwitchCounter(REED_PIN, debounce=50)
+        self.callback = callback
 
-    total_distance = 0.0
-    top_speed = 0.0
+        self.speed = 0.0
+        self.distance = 0.0
+        self.top_speed = 0.0
 
-    while True:
-        counter_value = counter.pop_counter()
-        distance = counter_value * DISTANCE_PER_ROTATION # in mm
-        speed = HOUR_FRACTION * distance                 # in mm/h
+        loop = asyncio.get_event_loop()
+        loop.create_task(self.update())
+    
+    async def update(self):
+        while(True):
+            counter_value = self.counter.pop_counter()
+            distance = counter_value * DISTANCE_PER_ROTATION # in mm
+            speed = HOUR_FRACTION * distance                 # in mm/h
 
-        total_distance += distance
-        top_speed = max(top_speed, speed)
+            dirty = False
+            if speed != self.speed or distance > 0 or speed > self.top_speed:
+                dirty = True
 
-        print("SPEEDOMETER: Counter: {} Distance: {}m Speed: {}km/h Total Distance: {}m Top Speed: {}".format(counter_value, 
-                                                                                                              distance / 1000.0, 
-                                                                                                              speed / 1000000.0,
-                                                                                                              total_distance / 1000.0,
-                                                                                                              top_speed / 1000000.0))
-        await asyncio.sleep(DELAY)
+            self.speed = speed
+            self.distance += distance
+            self.top_speed = max(self.top_speed, self.speed)
+
+            if dirty and self.callback:
+                self.callback(self.speed, self.distance, self.top_speed)
+
+            print("SPEEDOMETER: Counter: {} Distance: {}m Speed: {}km/h Total Distance: {}m Top Speed: {}".format(counter_value, 
+                                                                                                                distance / 1000.0, 
+                                                                                                                self.speed / 1000000.0,
+                                                                                                                self.distance / 1000.0,
+                                                                                                                self.top_speed / 1000000.0))
+            await asyncio.sleep(DELAY)        
