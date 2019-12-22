@@ -68,7 +68,7 @@ class LightShowScreen(display.DisplayScreen):
         self.light_show = light_show
         self._effect_order = ["larson", "rainbow",
                               "red_fire", "green_fire", "blue_fire",
-                              "red_breathing", "green_breathing", "green_breathing",
+                              "red_breathing", "green_breathing", "blue_breathing",
                               "off"]
         self._dirty = False
 
