@@ -32,7 +32,6 @@ class SwitchCounter(object):
 class Speedometer(object):
     def __init__(self, callback=None):
         self.counter = SwitchCounter(REED_PIN, debounce=50)
-        self.callback = callback
 
         self.speed = 0.0
         self.distance = 0.0
@@ -48,17 +47,12 @@ class Speedometer(object):
     def reset_trip(self):
         self.trip = 0.0
         self.top_speed = 0.0
-        self.push_to_callback()
-
-    def push_to_callback(self):
-        if self.callback:
-            self.callback(self.speed, self.distance, self.top_speed, self.trip)
 
     async def update(self):
         while(True):
             counter_value = self.counter.pop_counter()
-            distance = counter_value * DISTANCE_PER_ROTATION # in mm
-            speed = HOUR_FRACTION * distance                 # in mm/h
+            distance = counter_value * DISTANCE_PER_ROTATION / 1000.0 # in m
+            speed = HOUR_FRACTION * distance / 1000.0                 # in km/h
 
             dirty = False
             if speed != self.speed or distance > 0 or speed > self.top_speed:
@@ -68,9 +62,6 @@ class Speedometer(object):
             self.distance += distance
             self.trip += distance
             self.top_speed = max(self.top_speed, self.speed)
-
-            if dirty:
-                self.push_to_callback()
 
             await asyncio.sleep(DELAY)
 
@@ -89,8 +80,6 @@ class Speedometer(object):
             print("SPEEDOMETER: Trip data loaded, {:.2f} trip, {:.2f} top speed".format(self.trip, self.top_speed))
         except:
             print("SPEEDOMETER: ERROR - could not read trip and speed from /data/trip.txt, does it exist?")
-
-        self.push_to_callback()
 
     def save(self, trip=True, total=True):
         if total:
