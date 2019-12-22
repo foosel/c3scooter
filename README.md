@@ -18,3 +18,16 @@ A ridiculously over the top "pimp-my-ride" for my 36c3 scooter.
   * Neodymium disc magnet, e.g. 8x3
   * [RAVPower 5000mAh power bank](https://www.amazon.de/gp/product/B07KSWHV45/) ([Affiliate Link](https://amzn.to/34LeKbp))
   * velcro, cable ties, duct tape and similar...
+
+## Firmware
+
+  * Copy files over using `mpfshell`. Precompile everything but `main.py` to ` .mpf`.
+
+## Dev Environment
+
+```
+python3 -m virtualenv -p python3.6 venv
+source venv/bin/activate
+pip install -r requirements.txt
+ln -s venv/lib/python3.6/site-packages/mpy_cross/mpy-cross venv/bin/mpy-cross
+```
