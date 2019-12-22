@@ -9,9 +9,12 @@ A ridiculously over the top "pimp-my-ride" for my 36c3 scooter.
 
 ## Hardware
 
-  * [WeSkate Scooter](https://www.amazon.de/gp/product/B07SS7GXDT/)
-  * [Lolin D32](https://wiki.wemos.cc/products:d32:d32) (but any ESP32 or MicroPython based board should work just fine)
-    * Note: The Lolin board appears to have a circuit design flaw causing in issues to enter the bootloader. It ships with MicroPython, flashing a new version is a major PITA however. Thankfully the python files can be deployed without needing that thanks to something like `ampy`.
+  * [WeSkate Scooter](https://www.amazon.de/gp/product/B07SS7GXDT/) ([Affiliate Link](https://amzn.to/2PQr7il))
+  * ["Wemos" Mini D1 ESP32](https://www.aliexpress.com/item/32834982479.html) (but any ESP32 or MicroPython based board should work just fine)
   * WS2812 LED strip, 5V, 60 Leds/m, optionally black PCB & IP67
-  * [RAVPower 5000mAh power bank](https://www.amazon.de/gp/product/B07KSWHV45/)
-
+  * [Waveshare 1.5" 128x128px RGB OLED module](https://www.aliexpress.com/item/32878557203.html)
+  * [KY-040 rotary encoder module](https://www.amazon.de/gp/product/B07CMSHWV6/) ([Affiliate Link](https://amzn.to/2ScIAmC))
+  * [Reedswitch, plastic housing](https://www.amazon.de/gp/product/B07SZDGXLC/) ([Affiliate Link](https://amzn.to/35ZC6eE))
+  * Neodymium disc magnet, e.g. 8x3
+  * [RAVPower 5000mAh power bank](https://www.amazon.de/gp/product/B07KSWHV45/) ([Affiliate Link](https://amzn.to/34LeKbp))
+  * velcro, cable ties, duct tape and similar...
