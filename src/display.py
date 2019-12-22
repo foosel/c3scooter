@@ -13,7 +13,7 @@ PIN_DISPLAY_CS = 32
 PIN_DISPLAY_RST = 21
 PIN_DISPLAY_DC = 17
 
-PIN_KNOB_CLK = 5
+PIN_KNOB_CLK = 18
 PIN_KNOB_DT = 23
 PIN_KNOB_SWITCH = 19
 
@@ -27,7 +27,7 @@ class RotaryEncoder(object):
 
         loop = asyncio.get_event_loop()
         loop.create_task(self.check())
-    
+
     async def check(self):
         old_value = 0
 
@@ -39,7 +39,7 @@ class RotaryEncoder(object):
                 self._cb_ccw(difference)
             elif old_value > new_value and callable(self._cb_cw):
                 self._cb_cw(difference)
-            
+
             old_value = new_value
 
             await asyncio.sleep_ms(self._delay)
@@ -83,23 +83,23 @@ class ScooterDisplay(object):
         loop.create_task(self.update_display())
 
         # Encoder rotation
-        #self.encoder = RotaryEncoder(PIN_KNOB_CLK, PIN_KNOB_DT, cw=self.encoder_cw, ccw=self.encoder_ccw)
-        
+        self.encoder = RotaryEncoder(PIN_KNOB_CLK, PIN_KNOB_DT, cw=self.encoder_cw, ccw=self.encoder_ccw)
+
         # Encoder button
         self.button = Pushbutton(Pin(PIN_KNOB_SWITCH, Pin.IN))
         self.button.release_func(self.encoder_push)
-    
+
     def encoder_cw(self, steps):
         print("DISPLAY: Encoder CW, {} steps".format(steps))
         self._screen += 1
-        if self._screen > self.screens.length - 1:
+        if self._screen > len(self.screens) - 1:
             self._screen = 0
 
     def encoder_ccw(self, steps):
         print("DISPLAY: Encoder CCW, {} steps".format(steps))
         self._screen -= 1
         if self._screen < 0:
-            self._screen = self.screens.length - 1
+            self._screen = len(self.screens) - 1
 
     def encoder_push(self):
         print("DISPLAY: Encoder PUSH")
