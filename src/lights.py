@@ -120,14 +120,19 @@ class SimpleDot(Effect):
 class RainbowEffect(Effect):
     def __init__(self, delay):
         self._delay = delay
+        self._i = 0
 
     async def run(self, lights):
-        for i in range(256):
-            for j in range(lights.count):
-                pos = int((i * 256 / lights.count) + j) % 255
-                lights.set_pixel(j, self.color_on_wheel(pos))
-            lights.apply()
-            await asyncio.sleep_ms(self._delay)
+        for j in range(lights.count):
+            pos = int((self._i * 256 / lights.count) + j) % 255
+            lights.set_pixel(j, self.color_on_wheel(pos))
+        lights.apply()
+
+        self._i += 1
+        if self._i > 255:
+            self._i = 0
+
+        await asyncio.sleep_ms(self._delay)
 
     def color_on_wheel(self, pos):
         if pos < 85:
@@ -212,7 +217,7 @@ class LightShow(object):
         self._lights = ScooterLight(PIXEL_PIN, PIXEL_COUNT)
 
         self._effects = dict(larson=LarsonScannerEffect((255, 0, 0), 30),
-                             #rainbow=RainbowEffect(100),
+                             rainbow=RainbowEffect(70),
                              red_fire=FireEffect(100, 60, 15, FireEffect.RED),
                              green_fire=FireEffect(100, 60, 15, FireEffect.GREEN),
                              blue_fire=FireEffect(100, 60, 15, FireEffect.BLUE),
@@ -220,7 +225,9 @@ class LightShow(object):
                              blue_breathing=BreathingEffect(BreathingEffect.BLUE, 70),
                              green_breathing=BreathingEffect(BreathingEffect.GREEN, 70),
                              off=NoEffect())
-        self._effect = "red_breathing"
+
+        self._effect = "larson"
+        self.load()
 
         loop = asyncio.get_event_loop()
         loop.create_task(self.update())
@@ -234,6 +241,7 @@ class LightShow(object):
         if not value in self._effects:
             raise ValueError()
         self._effect = value
+        self.save()
         print("LIGHTSHOW: New effect = {}".format(self._effect))
 
     async def update(self):
@@ -245,3 +253,20 @@ class LightShow(object):
             effect = self._effect
             await self._effects[self._effect].run(self._lights)
 
+    def load(self):
+        try:
+            with open("/data/effect.txt", "r") as f:
+                effect = f.readline().strip()
+            print("LIGHTSHOW: Loaded effect {} from /data/effect.txt".format(effect))
+            if effect in self._effects:
+                self._effect = effect
+        except:
+            print("LIGHTSHOW: ERROR - Could not load effect from /data/effect.txt")
+
+    def save(self):
+        try:
+            with open("/data/effect.txt", "w") as f:
+                f.write(self._effect)
+                f.write("\n")
+        except:
+            print("LIGHTSHOW: ERROR - Could not write effect to /data/effect.txt")

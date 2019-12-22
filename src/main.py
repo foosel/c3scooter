@@ -110,7 +110,10 @@ class SpeedometerScreen(display.DisplayScreen):
 class LightShowScreen(display.DisplayScreen):
     def __init__(self, light_show):
         self.light_show = light_show
-        self._effect_order = ["larson", "red_fire", "green_fire", "blue_fire", "red_breathing", "blue_breathing", "green_breathing", "off"]
+        self._effect_order = ["larson", "rainbow",
+                              "red_fire", "green_fire", "blue_fire",
+                              "red_breathing", "green_breathing", "green_breathing",
+                              "off"]
         self._dirty = False
 
     def update(self, screen, needs_full_redraw=False):
