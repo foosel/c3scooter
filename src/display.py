@@ -17,6 +17,9 @@ PIN_KNOB_CLK = 18
 PIN_KNOB_DT = 23
 PIN_KNOB_SWITCH = 19
 
+FONT_UNISPACE = XglcdFont("fonts/Unispace12x24.c", 12, 24)
+FONT_FIXED = XglcdFont("fonts/FixedFont5x8.c", 5, 7)
+
 class RotaryEncoder(object):
     def __init__(self, pin_clk, pin_dt, delay=100, cw=None, ccw=None):
         self._rotary = RotaryIRQ(pin_clk, pin_dt)
@@ -44,6 +47,15 @@ class RotaryEncoder(object):
 
             await asyncio.sleep_ms(self._delay)
 
+class SafeDisplay(Display):
+    def draw_text(self, x, y, text, font, color,  background=0,
+                  landscape=False, spacing=1):
+        max_length = (self.width - x) // (font.width + spacing)
+        text = text[0:min(max_length, len(text))]
+        Display.draw_text(self, x, y, text, font, color, background=background,
+                          landscape=landscape, spacing=spacing)
+
+
 class DisplayScreen(object):
     def update(self, display, needs_full_redraw=False):
         pass
@@ -59,11 +71,10 @@ class DisplayScreen(object):
 
 class DemoScreen(DisplayScreen):
     def __init__(self):
-        self.font = XglcdFont("fonts/Unispace12x24.c", 12, 24)
         self.y = 0
 
     def update(self, display, needs_full_redraw=False):
-        display.draw_text(0, self.y, "Unispace", unispace, color565(255,128,0))
+        display.draw_text(0, self.y, "Unispace", FONT_UNISPACE, color565(255,128,0))
         self.y += 24
         if self.y > 100:
             self.y = 0
@@ -77,7 +88,7 @@ class ScooterDisplay(object):
 
         # OLED
         spi = SPI(2, baudrate=14500000, sck=Pin(PIN_DISPLAY_CLK), mosi=Pin(PIN_DISPLAY_MOSI))
-        self.display = Display(spi, dc=Pin(PIN_DISPLAY_DC), cs=Pin(PIN_DISPLAY_CS), rst=Pin(PIN_DISPLAY_RST))
+        self.display = SafeDisplay(spi, dc=Pin(PIN_DISPLAY_DC), cs=Pin(PIN_DISPLAY_CS), rst=Pin(PIN_DISPLAY_RST))
 
         loop = asyncio.get_event_loop()
         loop.create_task(self.update_display())

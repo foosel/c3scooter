@@ -220,18 +220,20 @@ class LightShow(object):
                              blue_breathing=BreathingEffect(BreathingEffect.BLUE, 70),
                              green_breathing=BreathingEffect(BreathingEffect.GREEN, 70),
                              off=NoEffect())
-        self._effect_order = ["larson", "red_fire", "green_fire", "blue_fire", "red_breathing", "blue_breathing", "green_breathing", "off"]
         self._effect = "red_breathing"
 
         loop = asyncio.get_event_loop()
         loop.create_task(self.update())
 
-    def next_effect(self):
-        index = self._effect_order.index(self._effect)
-        index += 1
-        if index > len(self._effect_order) - 1:
-            index = 0
-        self._effect = self._effect_order[index]
+    @property
+    def effect(self):
+        return self._effect
+
+    @effect.setter
+    def effect(self, value):
+        if not value in self._effects:
+            raise ValueError()
+        self._effect = value
         print("LIGHTSHOW: New effect = {}".format(self._effect))
 
     async def update(self):
