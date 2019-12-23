@@ -14,8 +14,11 @@ import speedometer
 import display
 
 class LogoScreen(display.DisplayScreen):
-    def __init__(self):
+    def __init__(self, light_show):
         display.DisplayScreen.__init__(self)
+
+        self._light_show = light_show
+        self._light_effect = None
 
         self._off = False
         self._dirty = False
@@ -31,6 +34,13 @@ class LogoScreen(display.DisplayScreen):
             screen.draw_image("/36c3-logo.raw", x=self._x0, y=self._y0, w=127, h=127)
 
     def encoder_click(self):
+        if self._off:
+            # reset light effect
+            self._light_show.effect = self._light_effect
+        else:
+            # disable light effect
+            self._light_effect = self._light_show.effect
+            self._light_show.effect = "off"
         self._off = not self._off
         self._dirty = True
 
@@ -123,9 +133,6 @@ class LightShowScreen(display.DisplayScreen):
 
 
 def main():
-    # logo screen
-    logo_screen = LogoScreen()
-
     # light show
     light_show = lights.LightShow()
     light_show_screen = LightShowScreen(light_show)
@@ -133,6 +140,9 @@ def main():
     # speedometer
     sm = speedometer.Speedometer()
     speedometer_screen = SpeedometerScreen(sm)
+
+    # logo screen
+    logo_screen = LogoScreen(light_show)
 
     # display unit
     display_unit = display.ScooterDisplay([logo_screen,
