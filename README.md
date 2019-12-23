@@ -2,6 +2,8 @@
 
 A ridiculously over the top "pimp-my-ride" for my 36c3 scooter.
 
+![](./assets/scooter.jpg)
+
 ## Contents
 
   * `src` - MicroPython firmware, flash with `ampy` (`pip install adafruit-ampy` & `ampy -p <port> put main.py`)
