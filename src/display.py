@@ -7,6 +7,8 @@ from xglcd_font import XglcdFont
 
 import uasyncio as asyncio
 
+import time
+
 PIN_DISPLAY_MOSI = 27
 PIN_DISPLAY_CLK = 25
 PIN_DISPLAY_CS = 32
@@ -57,6 +59,14 @@ class SafeDisplay(Display):
 
 
 class DisplayScreen(object):
+    PIXEL_SHIFT_INTERVAL = 60 * 1000 # 1 min
+
+    def __init__(self):
+        self._x0 = 0
+        self._y0 = 0
+        self._last_shift = time.ticks_ms()
+        self._shift_offsets = [(0, 1), (1, 1), (1, 0), (0, 0)]
+
     def update(self, display, needs_full_redraw=False):
         pass
 
@@ -74,6 +84,15 @@ class DisplayScreen(object):
 
     def encoder_longpress(self):
         pass
+
+    def needs_pixel_shift(self):
+        return self._last_shift + self.PIXEL_SHIFT_INTERVAL < time.ticks_ms()
+
+    def pixel_shift(self):
+        self._x0, self._y0 = self._shift_offsets.pop(0)
+        self._shift_offsets.append((self._x0, self._y0))
+        self._last_shift = time.ticks_ms()
+        print("DISPLAYSCREEN: Pixel shift to avoid burn-in, x0={}, y0={}".format(self._x0, self._y0))
 
 class DemoScreen(DisplayScreen):
     def __init__(self):
@@ -134,11 +153,18 @@ class ScooterDisplay(object):
 
     async def update_display(self):
         current_screen = self._screen
-        needs_full_redraw = True
+        screen_changed = True
+        needs_pixel_shift = False
+
         while True:
-            if needs_full_redraw:
+            if screen_changed or needs_pixel_shift:
                 self.display.clear()
-            self.screens[self._screen].update(self.display, needs_full_redraw=needs_full_redraw)
+            if needs_pixel_shift:
+                self.screens[self._screen].pixel_shift()
+
+            self.screens[self._screen].update(self.display, needs_full_redraw=screen_changed or needs_pixel_shift)
             current_screen = self._screen
             await asyncio.sleep_ms(1000)
-            needs_full_redraw = current_screen != self._screen
+
+            screen_changed = current_screen != self._screen
+            needs_pixel_shift = self.screens[self._screen].needs_pixel_shift()

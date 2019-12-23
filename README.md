@@ -83,9 +83,9 @@ if __name__ == '__main__':
 
 ## TODO / ideas
 
-  * [ ] Pixel shift on screens to avoid burn-in, especially logo & speedometer
-  * [ ] RTC & csv data logging?
   * [ ] Another LED strip up the steering column?
+  * [ ] RTC?
+  * [ ] CSV data logging?
   * [ ] Sound & bass reactive (MSGEQ7)
   * [ ] 6-dof sensor & acceleration logging
   * [ ] electronic horn (mp3 board + speaker)
