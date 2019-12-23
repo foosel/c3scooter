@@ -31,3 +31,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 ln -s venv/lib/python3.6/site-packages/mpy_cross/mpy-cross venv/bin/mpy-cross
 ```
+
+## TODO
+
+  * [ ] Pixel shift on screens to avoid burn-in, especially logo & speedometer
+  * [ ] RTC & csv data logging?
+  * [ ] Another LED strip up the steering column?
