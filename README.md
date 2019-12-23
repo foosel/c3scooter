@@ -34,8 +34,11 @@ pip install -r requirements.txt
 ln -s venv/lib/python3.6/site-packages/mpy_cross/mpy-cross venv/bin/mpy-cross
 ```
 
-## TODO
+## TODO / ideas
 
   * [ ] Pixel shift on screens to avoid burn-in, especially logo & speedometer
   * [ ] RTC & csv data logging?
   * [ ] Another LED strip up the steering column?
+  * [ ] Sound & bass reactive (MSGEQ7)
+  * [ ] 6-dof sensor & acceleration logging
+  * [ ] electronic horn (mp3 board + speaker)
