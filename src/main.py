@@ -13,6 +13,25 @@ import lights
 import speedometer
 import display
 
+class LogoScreen(display.DisplayScreen):
+    def __init__(self):
+        self._off = False
+        self._dirty = False
+
+    def update(self, screen, needs_full_redraw=False):
+        if not needs_full_redraw and not self._dirty:
+            return
+
+        self._dirty = False
+        if self._off:
+            screen.clear()
+        else:
+            screen.draw_image("/36c3-logo.raw")
+
+    def encoder_click(self):
+        self._off = not self._off
+        self._dirty = True
+
 class SpeedometerScreen(display.DisplayScreen):
     def __init__(self, speedometer):
         self._speedometer = speedometer
@@ -93,6 +112,9 @@ class LightShowScreen(display.DisplayScreen):
 
 
 def main():
+    # logo screen
+    logo_screen = LogoScreen()
+
     # light show
     light_show = lights.LightShow()
     light_show_screen = LightShowScreen(light_show)
@@ -102,7 +124,8 @@ def main():
     speedometer_screen = SpeedometerScreen(sm)
 
     # display unit
-    display_unit = display.ScooterDisplay([speedometer_screen,
+    display_unit = display.ScooterDisplay([logo_screen,
+                                           speedometer_screen,
                                            light_show_screen])
 
     loop = asyncio.get_event_loop()
