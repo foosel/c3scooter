@@ -45,6 +45,8 @@ class LogoScreen(display.DisplayScreen):
         self._dirty = True
 
 class SpeedometerScreen(display.DisplayScreen):
+    RESET_TIMER = 10 * 1000 # 10s
+
     def __init__(self, speedometer):
         display.DisplayScreen.__init__(self)
 
@@ -54,6 +56,8 @@ class SpeedometerScreen(display.DisplayScreen):
                            distance=False,
                            top_speed=False,
                            trip=False)
+
+        self._reset_timer = None
 
         self._speed = 0.0
         self._distance = 0.0
@@ -94,8 +98,12 @@ class SpeedometerScreen(display.DisplayScreen):
             screen.draw_text(self._x0, 100 + self._y0, "{:.2f}".format(self._distance / 1000.0), display.FONT_FIXED, color565(0, 255, 0))
 
     def encoder_longpress(self):
-        self._speedometer.reset_trip()
-        self._speedometer.save()
+        if self._reset_timer and self._reset_timer + self.RESET_TIMER > time.ticks_ms():
+            print("SPEEDOMETER: reset trip triggered")
+            self._speedometer.reset_trip()
+            self._speedometer.save()
+        else:
+            self._reset_timer = time.ticks_ms()
 
     def encoder_dblclick(self):
         self._speedometer.save()
