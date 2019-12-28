@@ -73,6 +73,31 @@ class LarsonScannerEffect(Effect):
         await move(False)
         await move(True)
 
+class RunningLightEffect(Effect):
+    LIGHT = (256, 32, 32, 4, 4)
+
+    def __init__(self, color, speed):
+        self._color = color
+        self._speed = speed
+        self._colors = [(self._color[0] * x // 256, self._color[1] * x // 256, self._color[2] * x // 256) for x in self.LIGHT]
+
+    async def run(self, lights):
+        colors = [(self._color[0] * x // 256, self._color[1] * x // 256, self._color[2] * x // 256) for x in self.LIGHT]
+        pixels = lights.count
+
+        r = range(len(self.LIGHT) - 1, pixels)
+
+        for i in r:
+            lights.clear()
+
+            for j in range(len(colors)):
+                p = i - len(colors) + j + 1
+                if p < 0 or p > pixels - 1:
+                    continue
+                lights.set_pixel(p, colors[j])
+            lights.apply()
+
+            await asyncio.sleep_ms(self._speed)
 
 class BreathingEffect(Effect):
     RED = (255, 0, 0)
@@ -217,6 +242,9 @@ class LightShow(object):
         self._lights = ScooterLight(PIXEL_PIN, PIXEL_COUNT)
 
         self._effects = dict(larson=LarsonScannerEffect((255, 0, 0), 30),
+                             red_running=RunningLightEffect((255, 0, 0), 30),
+                             green_running=RunningLightEffect((0, 255, 0), 30),
+                             blue_running=RunningLightEffect((0, 0, 255), 30),
                              rainbow=RainbowEffect(70),
                              red_fire=FireEffect(100, 60, 15, FireEffect.RED),
                              green_fire=FireEffect(100, 60, 15, FireEffect.GREEN),
