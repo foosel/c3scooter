@@ -1,6 +1,10 @@
 # c3scooter
 
+![Project unmaintained](https://img.shields.io/badge/project-unmaintained-red.svg)
+
 A ridiculously over the top "pimp-my-ride" for my 36c3 scooter.
+
+Provided as-is for documentation purposes, not actively maintained.
 
 ![](./assets/scooter.jpg)
 
